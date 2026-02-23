@@ -1,8 +1,7 @@
 import requests
-import json
 
 TELEGRAM_TOKEN = "8048665417:AAEUWd5RCFZ3hEgOcHjnr4MRyKyvANf4-qs"
-GEMINI_API_KEY = "AIzaSyA7hRs1veViDmfDqEkMZLkODp774jD6ZUE"
+GEMINI_API_KEY = "AIzaSyDHq07XbbnieloNhTjfNYGb_JlMRLxmsYQ"
 
 def send_message(chat_id, text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -14,9 +13,10 @@ def ask_gemini(question):
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
     try:
         r = requests.post(url, json=payload, timeout=30)
-        return r.json()["candidates"][0]["content"]["parts"][0]["text"]
-    except:
-        return "حدث خطأ، حاول مرة أخرى."
+        data = r.json()
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+    except Exception as e:
+        return f"حدث خطأ: {str(e)}"
 
 def get_updates(offset=None):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
@@ -37,9 +37,9 @@ def main():
                 text = msg.get("text", "")
                 if chat_id and text:
                     if text == "/start":
-                        send_message(chat_id, "مرحباً! أنا بوت الأنظمة القانونية السعودية. اكتب سؤالك وسأجيبك!")
+                        send_message(chat_id, "مرحباً! أنا بوت الأنظمة القانونية السعودية.\n\nاكتب سؤالك وسأجيبك! 🏛️")
                     else:
-                        send_message(chat_id, "⏳ جاري البحث...")
+                        send_message(chat_id, "⏳ جاري البحث في الأنظمة السعودية...")
                         response = ask_gemini(text)
                         send_message(chat_id, response)
         except Exception as e:
